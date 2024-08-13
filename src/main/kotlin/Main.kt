@@ -1,5 +1,6 @@
 import com.google.gson.Gson;
 import com.dampcake.bencode.Bencode;
+import com.dampcake.bencode.Type;
 
 val gson = Gson()
 
@@ -17,15 +18,15 @@ fun main(args: Array<String>) {
 }
 
 fun decodeBencode(bencodedString: String): Any {
-    when {
-        Character.isDigit(bencodedString[0]) -> {
-            val firstColonIndex = bencodedString.indexOfFirst { it == ':' }
-            val length = Integer.parseInt(bencodedString.substring(0, firstColonIndex))
-            return bencodedString.substring(firstColonIndex + 1, firstColonIndex + 1 + length)
-        }
-        bencodedString.startsWith('i')  && bencodedString.endsWith('e')-> {
-            return bencodedString.substring(1, bencodedString.lastIndex).toLong()
-        }
-        else -> TODO("Only strings are supported at the moment")
+    val bencode = Bencode()
+
+    val decoded: Any = when {
+        // convert the string to a byte array and then decodes it as Type specified using
+        // the decode method of the Bencode class.
+        // TODO: redo this without using the bencode package
+        bencodedString.startsWith("i") -> bencode.decode(bencodedString.toByteArray(), Type.NUMBER)
+        bencodedString.startsWith("l") -> bencode.decode(bencodedString.toByteArray(), Type.LIST)
+        else -> bencode.decode(bencodedString.toByteArray(), Type.STRING)
     }
+    return decoded
 }
