@@ -1,18 +1,26 @@
 import com.google.gson.Gson;
 import com.dampcake.bencode.Bencode;
 import com.dampcake.bencode.Type;
+import java.io.File
 
 val gson = Gson()
 
 fun main(args: Array<String>) {
-    val command = args[0]
-    when (command) {
+    when (val command = args[0]) {
         "decode" -> {
-             val bencodedValue = args[1]
-             val decoded = decodeBencode(bencodedValue)
-             println(gson.toJson(decoded))
-             return
+            val bencodedValue = args[1]
+            val decoded = decodeBencode(bencodedValue)
+            println(gson.toJson(decoded))
+            return
         }
+
+        "info" -> {
+            val fileName = args[1]
+            printInfo(fileName)
+
+            return
+        }
+
         else -> println("Unknown command $command")
     }
 }
@@ -30,4 +38,15 @@ fun decodeBencode(bencodedString: String): Any {
         else -> bencode.decode(bencodedString.toByteArray(), Type.STRING)
     }
     return decoded
+}
+
+fun printInfo(fileName: String) {
+    val bencode = Bencode()
+    val data = File(fileName).readBytes()
+    val torrentData = bencode.decode(data, Type.DICTIONARY) as Map<String, Any>
+    val url = torrentData["announce"] as String
+    val info = torrentData["info"] as MutableMap<*, *>
+    val length = info["length"]
+    println("Tracker URL: $url")
+    println("Length: $length")
 }
