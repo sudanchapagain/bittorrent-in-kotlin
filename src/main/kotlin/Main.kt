@@ -26,6 +26,7 @@ fun decodeBencode(bencodedString: String): Any {
         // TODO: redo this without using the bencode package
         bencodedString.startsWith("i") -> bencode.decode(bencodedString.toByteArray(), Type.NUMBER)
         bencodedString.startsWith("l") -> bencode.decode(bencodedString.toByteArray(), Type.LIST)
+        bencodedString.startsWith("d") -> bencode.decode(bencodedString.toByteArray(), Type.DICTIONARY)
         else -> bencode.decode(bencodedString.toByteArray(), Type.STRING)
     }
     return decoded
