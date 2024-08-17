@@ -57,7 +57,13 @@ object MainKt {
                 torrent.pieceHashes.forEach { hash ->
                     println(hash)
                 }
+            }
 
+            "peers" -> {
+                val filePath = args[1]
+                val tracker = Tracker(filePath)
+                val peers = tracker.requestPeers()
+                println(peers)
             }
 
             else -> {
