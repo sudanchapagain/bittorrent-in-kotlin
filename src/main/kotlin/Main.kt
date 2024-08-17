@@ -52,6 +52,12 @@ object MainKt {
                 println("Tracker URL: ${torrent.announce}")
                 println("Length: ${torrent.length}")
                 println("Info Hash: ${torrent.infoHash?.let { bytesToHex(it) }}")
+                println("Piece Length: ${torrent.pieceLength}")
+                println("Piece Hashes: ")
+                torrent.pieceHashes.forEach { hash ->
+                    println(hash)
+                }
+
             }
 
             else -> {
