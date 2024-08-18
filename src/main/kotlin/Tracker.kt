@@ -5,6 +5,7 @@ import java.net.URL
 import java.nio.ByteBuffer
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.net.Socket
 
 @Suppress("DEPRECATION")
 class Tracker(torrentFilePath: String) {
@@ -73,5 +74,40 @@ class Tracker(torrentFilePath: String) {
             "Error occurred while requesting peers: ${e.message}"
         }
 
+    }
+
+    fun performHandshake(peerIp: String, peerPort: Int, infoHash: ByteArray) {
+        val protocolName = "BitTorrent protocol"
+        val protocolNameLength = protocolName.length.toByte()
+        val reservedBytes = ByteArray(8) { 0 }
+        val peerId = "00112233445566778899".toByteArray()
+
+        try {
+            Socket(peerIp, peerPort).use { socket ->
+                socket.soTimeout = 5000
+                val outputStream = socket.getOutputStream()
+                val inputStream = socket.getInputStream()
+
+                val handshake = ByteBuffer.allocate(1 + protocolName.length + reservedBytes.size + infoHash.size + peerId.size)
+                handshake.put(protocolNameLength)
+                handshake.put(protocolName.toByteArray())
+                handshake.put(reservedBytes)
+                handshake.put(infoHash)
+                handshake.put(peerId)
+
+                outputStream.write(handshake.array())
+
+                val response = ByteArray(68)
+                inputStream.read(response)
+
+
+                val receivedPeerId = response.sliceArray(48 until 68)
+                val hexPeerId = receivedPeerId.joinToString("") { "%02x".format(it) }
+
+                println("Peer ID: $hexPeerId")
+            }
+        } catch (e: Exception) {
+            println("Error during handshake: ${e.message}")
+        }
     }
 }

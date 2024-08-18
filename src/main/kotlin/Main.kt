@@ -66,6 +66,22 @@ object MainKt {
                 println(peers)
             }
 
+            "handshake" -> {
+                val filePath = args[1]
+                val peerAddress = args[2].split(":")
+                val peerIp = peerAddress[0]
+                val peerPort = peerAddress[1].toInt()
+
+                val tracker = Tracker(filePath)
+                val torrent = Torrent(Files.readAllBytes(Paths.get(filePath)))
+
+                val infoHash = torrent.infoHash ?: run {
+                    println("No info hash found in torrent file.")
+                    return
+                }
+                tracker.performHandshake(peerIp, peerPort, infoHash)
+            }
+
             else -> {
                 println("Unknown command: $command")
             }
