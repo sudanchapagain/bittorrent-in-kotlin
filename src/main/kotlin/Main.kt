@@ -69,6 +69,7 @@ object MainKt {
             "handshake" -> {
                 val filePath = args[1]
                 val peerAddress = args[2].split(":")
+
                 val peerIp = peerAddress[0]
                 val peerPort = peerAddress[1].toInt()
 
